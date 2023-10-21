@@ -1,0 +1,97 @@
+package com.example.medtime;
+
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private SeekBar timerSeekBar;
+    private TextView timerTextView;
+    private Button startButton;
+    private CountDownTimer countDownTimer;
+    private boolean isTimerRunning;
+    private long timeLeftInMillis;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        timerSeekBar = findViewById(R.id.timer_seek_bar);
+        timerTextView = findViewById(R.id.timer_text_view);
+        startButton = findViewById(R.id.start_button);
+
+        timerSeekBar.setMax(600); // 10 minutes
+        timerSeekBar.setProgress(30); // 30 seconds
+
+        timerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                timeLeftInMillis = progress * 1000L;
+                updateTimerText();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                if (isTimerRunning) {
+                    pauseTimer();
+                }
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isTimerRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            }
+        });
+    }
+
+    private void startTimer() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                updateTimerText();
+            }
+
+            @Override
+            public void onFinish() {
+                isTimerRunning = false;
+                startButton.setText("Start");
+                timerTextView.setText("Time's up!");
+            }
+        }.start();
+
+        isTimerRunning = true;
+        startButton.setText("Pause");
+    }
+
+    private void pauseTimer() {
+        countDownTimer.cancel();
+        isTimerRunning = false;
+        startButton.setText("Start");
+    }
+
+    private void updateTimerText() {
+        int minutes = (int) (timeLeftInMillis / 1000) / 60;
+        int seconds = (int) (timeLeftInMillis / 1000) % 60;
+        String timeLeftFormatted = String.format("%02d:%02d", minutes, seconds);
+        timerTextView.setText(timeLeftFormatted);
+    }
+
+}
