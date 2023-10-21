@@ -1,4 +1,4 @@
-package com.example.medtime;
+package com.example.myapplication;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -8,7 +8,23 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Random;
+
+
 public class MainActivity extends AppCompatActivity {
+        private TextView quoteTextView;
+        private Button newQuoteButton;
+
+        private String[] quotes = {
+                "Be the change you wish to see in the world.",
+                "In the middle of difficulty lies opportunity.",
+                "Believe you can and you're halfway there.",
+                "The only way to do great work is to love what you do.",
+                "We become what we think about.",
+                "The only true wisdom is in knowing you know nothing.",
+                "You miss 100% of the shots you don't take."
+        };
+        
 
     private SeekBar timerSeekBar;
     private TextView timerTextView;
@@ -59,23 +75,36 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        quoteTextView = findViewById(R.id.quote_text_view);
+        newQuoteButton = findViewById(R.id.new_quote_button);
+
+        newQuoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Random random = new Random();
+                int index = random.nextInt(quotes.length);
+                String randomQuote = quotes[index];
+                quoteTextView.setText(randomQuote);
+            }
+        });
     }
 
     private void startTimer() {
         countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                timeLeftInMillis = millisUntilFinished;
-                updateTimerText();
-            }
+        @Override
+        public void onTick(long millisUntilFinished) {
+            timeLeftInMillis = millisUntilFinished;
+            updateTimerText();
+        }
 
-            @Override
-            public void onFinish() {
-                isTimerRunning = false;
-                startButton.setText("Start");
-                timerTextView.setText("Time's up!");
-            }
-        }.start();
+        @Override
+        public void onFinish() {
+            isTimerRunning = false;
+            startButton.setText("Start");
+            timerTextView.setText("Time's up!");
+        }
+    }.start();
 
         isTimerRunning = true;
         startButton.setText("Pause");
